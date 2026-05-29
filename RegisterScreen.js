@@ -96,7 +96,7 @@ export default function RegisterScreen({ onNavigateToLogin, onRegisterSuccess })
         {/* En-tête avec Logo de l'entreprise */}
         <View style={styles.logoContainer}>
           <Image 
-            source={require('./assets/logo_pronosapp.png')} 
+            source={require('./assets/icon.png')} 
             style={styles.logoImage}
             resizeMode="contain"
             onError={() => console.log("Logo introuvable dans le dossier assets")}

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, StyleSheet, StatusBar, ActivityIndicator, View } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import LoginScreen from './LoginScreen'; 
 import RegisterScreen from './RegisterScreen'; 
@@ -8,6 +8,27 @@ import ProfileScreen from './ProfileScreen'; // <-- Intégration de l'écran Pro
 export default function App() {
   const [user, setUser] = useState(null);
   const [currentScreen, setCurrentScreen] = useState('LOGIN'); // Gère la bascule 'LOGIN' ou 'REGISTER'
+  const [isCheckingToken, setIsCheckingToken] = useState(true); // Gère l'état de chargement initial
+
+  // Auto-connexion : Vérification de l'existence d'un token au démarrage de l'application
+  useEffect(() => {
+    const checkExistingToken = async () => {
+      try {
+        const token = await SecureStore.getItemAsync('user_token');
+        if (token) {
+          // Simulation ou appel API de récupération du profil via le token existant
+          // Pour l'instant, on recrée un objet utilisateur basique
+          setUser({ token: token, email: 'utilisateur@vip.com' });
+        }
+      } catch (error) {
+        console.log('[SecureStore Init Error]:', error);
+      } finally {
+        setIsCheckingToken(false);
+      }
+    };
+
+    checkExistingToken();
+  }, []);
 
   // Gestion propre de la déconnexion avec destruction du token physique
   const handleLogout = async () => {
@@ -20,6 +41,15 @@ export default function App() {
       setCurrentScreen('LOGIN');
     }
   };
+
+  // Écran d'attente pendant la lecture du SecureStore au démarrage
+  if (isCheckingToken) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <ActivityIndicator size="large" color="#2E7D32" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -50,5 +80,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
